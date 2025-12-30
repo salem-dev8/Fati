@@ -4,16 +4,20 @@ const admin = require('firebase-admin');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const { Readable } = require('stream');
+const path = require('path');
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// --- 1. إعداد Firebase (نسخة محسنة للعمل على Vercel) ---
+// --- 1. إعداد Firebase (حل مشكلة الخطأ 16 في Vercel) ---
 try {
+    if (!process.env.SERVICE_ACCOUNT_KEY) {
+        throw new Error("متغير SERVICE_ACCOUNT_KEY غير موجود في إعدادات البيئة");
+    }
+
     const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
     
-    // هذا السطر هو السر في حل مشكلة الخطأ 16 (UNAUTHENTICATED)
-    // يقوم باستبدال رموز \n النصية بأسطر حقيقية يفهمها التشفير
+    // هذا السطر يحل مشكلة الـ Private Key في Vercel نهائياً
     if (serviceAccount.private_key) {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
@@ -22,9 +26,10 @@ try {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
         });
+        console.log("✅ تم الاتصال بـ Firebase بنجاح");
     }
 } catch (error) {
-    console.error("خطأ فادح في إعداد فايربيس:", error.message);
+    console.error("❌ خطأ في إعداد Firebase:", error.message);
 }
 
 const db = admin.firestore();
@@ -36,12 +41,13 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// --- 3. إعدادات Express و EJS ---
+// --- 3. إعدادات القوالب والملفات ---
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// --- وظيفة مساعدة لرفع الصور ---
+// دالة مساعدة لرفع الصور إلى كلوديناري
 const uploadToCloudinary = (buffer) => {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -57,15 +63,15 @@ const uploadToCloudinary = (buffer) => {
 
 // --- 4. المسارات (Routes) ---
 
-// الصفحة الرئيسية: عرض الزبائن
+// الصفحة الرئيسية: عرض قائمة الزبائن والمنتجات
 app.get('/', async (req, res) => {
     try {
         const snapshot = await db.collection('customers').orderBy('createdAt', 'desc').get();
         const customers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.render('index', { customers });
     } catch (error) {
-        console.error("Error fetching customers:", error);
-        res.status(500).send("خطأ في الاتصال بقاعدة البيانات: " + error.message);
+        console.error("خطأ أثناء جلب البيانات:", error);
+        res.status(500).send("حدث خطأ في الاتصال بقاعدة البيانات: " + error.message);
     }
 });
 
@@ -74,7 +80,7 @@ app.get('/create', (req, res) => {
     res.render('create');
 });
 
-// حفظ زبون ومنتج جديد
+// استقبال بيانات الزبون والمنتج الأول
 app.post('/add-customer', upload.single('image'), async (req, res) => {
     try {
         const { customerName, productName, price, status } = req.body;
@@ -100,11 +106,11 @@ app.post('/add-customer', upload.single('image'), async (req, res) => {
         res.redirect('/');
     } catch (error) {
         console.error(error);
-        res.send("فشل في الإضافة: " + error.message);
+        res.status(500).send("فشل إضافة الزبون: " + error.message);
     }
 });
 
-// إضافة منتج لزبون موجود
+// إضافة منتج إضافي لزبون موجود مسبقاً
 app.post('/add-product/:id', upload.single('image'), async (req, res) => {
     try {
         const customerId = req.params.id;
@@ -129,14 +135,15 @@ app.post('/add-product/:id', upload.single('image'), async (req, res) => {
 
         res.redirect('/');
     } catch (error) {
-        res.send("حدث خطأ: " + error.message);
+        res.status(500).send("حدث خطأ أثناء إضافة المنتج: " + error.message);
     }
 });
 
-// تشغيل الخادم
+// --- 5. تشغيل السيرفر ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`🚀 السيرفر يعمل على الرابط: http://localhost:${PORT}`);
 });
 
-module.exports = app; // مهم جداً لـ Vercel
+// تصدير التطبيق ليعمل على Vercel
+module.exports = app;
