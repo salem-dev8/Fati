@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>متجر فطيمة — إدارة الزبائن والمنتجات</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Cairo font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+  /* مدمج: styles.css */
+  :root {
+    --primary-1: #0d6efd;
+    --primary-2: #0dcaf0;
+    --muted: #6c757d;
+    --card-radius: 14px;
+    --accent-border: rgba(13,110,253,0.12);
+  }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(180deg, #f4f7fb 0%, #ffffff 100%);
+    color: #0f1724;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Navbar gradient */
+  .navbar {
+    background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 100%);
+  }
+
+  /* Cards */
+  .card {
+    border: none;
+    border-radius: var(--card-radius);
+  }
+
+  /* Avatar image */
+  .avatar-img {
+    width: 84px;
+    height: 84px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid var(--accent-border);
+    box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+    cursor: pointer;
+  }
+
+  /* Modal styling */
+  .modal-content {
+    border-radius: 12px;
+  }
+
+  /* Badges (status) */
+  .status-badge.bg-success {
+    background-color: #d1e7dd !important;
+    color: #0f5132 !important;
+    padding: 6px 10px;
+  }
+
+  .status-badge.bg-danger {
+    background-color: #f8d7da !important;
+    color: #842029 !important;
+    padding: 6px 10px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background-image: linear-gradient(90deg, var(--primary-1), var(--primary-2));
+    border: none;
+    box-shadow: 0 6px 20px rgba(13,110,253,0.12);
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 576px) {
+    .avatar-img { width: 64px; height: 64px; }
+  }
+
+  /* تنسيق إضافي صغير */
+  .card-body .text-primary { color: var(--primary-1) !important; }
+  .list-group-item img { box-shadow: 0 6px 18px rgba(15,23,42,0.06); border-radius:8px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg mb-4 shadow-sm">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-shop fs-3 me-2 text-white"></i>
+        <span class="fw-bold text-white">متجر فطيمة</span>
+      </a>
+
+      <div class="ms-auto d-flex gap-2">
+        <button id="openCreateBtn" class="btn btn-light text-primary fw-bold rounded-pill px-4">
+          <i class="bi bi-person-plus me-2"></i>زبون جديد
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mb-5">
+    <div id="emptyState" class="text-center py-5 text-muted visually-hidden">
+      <h4>لا يوجد زبائن حالياً</h4>
+      <p>ابدأ بإضافة أول زبون لوالدتك ❤️</p>
+    </div>
+
+    <div id="customersRow" class="row"></div>
+  </main>
+
+  <!-- Create Customer Modal -->
+  <div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="createForm" enctype="multipart/form-data">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>تسجيل زبون جديد</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">اسم الزبون</label>
+              <input type="text" name="customerName" class="form-control" placeholder="مثال: خالة عيشة" required>
+            </div>
+
+            <hr>
+
+            <h6 class="mb-2">المنتج الأول</h6>
+            <div class="mb-3">
+              <label class="form-label">اسم المنتج</label>
+              <input type="text" name="productName" class="form-control" placeholder="مثال: قماش كتان" required>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label">السعر (د.ج)</label>
+                <input type="number" name="price" class="form-control" placeholder="1000" required>
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label">حالة الدفع</label>
+                <select name="status" class="form-select">
+                  <option value="paid">مدفوع (خالص)</option>
+                  <option value="unpaid" selected>آجل (كريدي)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">صورة المنتج</label>
+              <input type="file" name="image" accept="image/*" class="form-control">
+            </div>
+
+            <div id="createAlert" class="alert d-none" role="alert"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-save me-2"></i>حفظ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic container for customer-specific modals (added dynamically) -->
+  <div id="modalsContainer"></div>
+
+  <!-- Bootstrap JS bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  /* مدمج: main.js */
+  document.addEventListener('DOMContentLoaded', () => {
+    const customersRow = document.getElementById('customersRow');
+    const emptyState = document.getElementById('emptyState');
+    const modalsContainer = document.getElementById('modalsContainer');
+
+    const createModalEl = document.getElementById('createModal');
+    const createModal = new bootstrap.Modal(createModalEl);
+    const openCreateBtn = document.getElementById('openCreateBtn');
+    const createForm = document.getElementById('createForm');
+    const createAlert = document.getElementById('createAlert');
+
+    openCreateBtn.addEventListener('click', () => {
+      createForm.reset();
+      createAlert.className = 'alert d-none';
+      createModal.show();
+    });
+
+    createForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      createAlert.className = 'alert alert-info';
+      createAlert.textContent = 'جاري الحفظ...';
+
+      const formData = new FormData(createForm);
+
+      try {
+        const res = await fetch('/api/customers', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          createAlert.className = 'alert alert-danger';
+          createAlert.textContent = data.error || 'فشل في الإنشاء';
+          return;
+        }
+        createAlert.className = 'alert alert-success';
+        createAlert.textContent = 'تمت الإضافة بنجاح';
+        createModal.hide();
+        await loadCustomers();
+      } catch (err) {
+        console.error(err);
+        createAlert.className = 'alert alert-danger';
+        createAlert.textContent = 'خطأ في الاتصال';
+      }
+    });
+
+    async function loadCustomers() {
+      try {
+        const res = await fetch('/api/customers');
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          customersRow.innerHTML = '<div class="col-12"><div class="alert alert-danger">فشل في تحميل الزبائن</div></div>';
+          return;
+        }
+        renderCustomers(data.customers || []);
+      } catch (err) {
+        console.error(err);
+        customersRow.innerHTML = '<div class="col-12"><div class="alert alert-danger">خطأ في الاتصال</div></div>';
+      }
+    }
+
+    function renderCustomers(customers) {
+      modalsContainer.innerHTML = '';
+      customersRow.innerHTML = '';
+
+      if (!customers.length) {
+        emptyState.classList.remove('visually-hidden');
+        return;
+      } else {
+        emptyState.classList.add('visually-hidden');
+      }
+
+      customers.forEach(customer => {
+        const total = (customer.products || []).reduce((acc, p) => acc + (Number(p.price) || 0), 0);
+        const avatar = (customer.products && customer.products.length) ? customer.products[0].image : 'https://via.placeholder.com/300x300?text=No+Image';
+
+        // Card
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4';
+        col.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex align-items-start gap-3">
+              <img src="${avatar}" class="avatar-img rounded" alt="صورة" role="button" data-customer-id="${customer.id}">
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                  <h5 class="m-0 text-primary">${escapeHtml(customer.name)}</h5>
+                  <div class="text-end">
+                    <small class="text-muted d-block">منتجات: <strong>${(customer.products || []).length}</strong></small>
+                    <small class="text-muted d-block">المجموع: <strong>${total} د.ج</strong></small>
+                  </div>
+                </div>
+                <p class="text-muted mt-2 small">اضغط على الصورة لعرض كل منتجات الزبون وتعديل الحالات</p>
+              </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+              <button class="btn btn-sm btn-outline-primary add-product-btn" data-customer-id="${customer.id}">
+                <i class="bi bi-plus-circle me-1"></i> إضافة منتج
+              </button>
+              <div>
+                <button class="btn btn-sm btn-link text-decoration-none view-customer-btn" data-customer-id="${customer.id}">
+                  <i class="bi bi-eye"></i> عرض الزبون
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        customersRow.appendChild(col);
+
+        // Build customer modal (view)
+        const viewModalId = `view-${customer.id}`;
+        const addModalId = `add-${customer.id}`;
+
+        const viewModal = document.createElement('div');
+        viewModal.className = 'modal fade';
+        viewModal.id = viewModalId;
+        viewModal.tabIndex = -1;
+        viewModal.innerHTML = `
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">الزبون: ${escapeHtml(customer.name)}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="d-flex gap-3 mb-3 align-items-center">
+                  <img src="${avatar}" class="rounded" style="width:96px;height:96px;object-fit:cover;" alt="">
+                  <div>
+                    <p class="mb-1"><strong>عدد المنتجات:</strong> ${(customer.products || []).length}</p>
+                    <p class="mb-0"><strong>المجموع:</strong> ${total} د.ج</p>
+                  </div>
+                </div>
+                <div class="list-group">
+                  ${(customer.products || []).map(p => `
+                    <div class="list-group-item d-flex align-items-center justify-content-between flex-wrap">
+                      <div class="d-flex align-items-center gap-3">
+                        <img src="${p.image}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;" alt="">
+                        <div>
+                          <div class="fw-bold">${escapeHtml(p.name)}</div>
+                          <small class="text-muted">السعر: ${p.price} د.ج</small><br>
+                          <small class="text-muted">التاريخ: ${new Date(p.date).toLocaleString('ar-EG')}</small>
+                        </div>
+                      </div>
+                      <div class="text-end">
+                        <span class="badge rounded-pill status-badge ${p.status === 'paid' ? 'bg-success' : 'bg-danger'} mb-2" data-product-id="${p.id}">
+                          ${p.status === 'paid' ? 'مدفوع' : 'غير مدفوع'}
+                        </span>
+                        <div>
+                          ${(p.status === 'unpaid')
+                            ? `<button class="btn btn-sm btn-outline-success toggle-status" data-customer-id="${customer.id}" data-product-id="${p.id}" data-new-status="paid"><i class="bi bi-check2-circle"></i> تعليم كـ مدفوع</button>`
+                            : `<button class="btn btn-sm btn-outline-secondary toggle-status" data-customer-id="${customer.id}" data-product-id="${p.id}" data-new-status="unpaid"><i class="bi bi-arrow-counterclockwise"></i> إعادة لـ آجل</button>`
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+              </div>
+            </div>
+          </div>
+        `;
+        modalsContainer.appendChild(viewModal);
+
+        // Add product modal
+        const addModal = document.createElement('div');
+        addModal.className = 'modal fade';
+        addModal.id = addModalId;
+        addModal.tabIndex = -1;
+        addModal.innerHTML = `
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form class="add-product-form" data-customer-id="${customer.id}" enctype="multipart/form-data">
+                <div class="modal-header">
+                  <h5 class="modal-title">إضافة منتج لـ: ${escapeHtml(customer.name)}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label>اسم المنتج</label>
+                    <input type="text" name="productName" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label>السعر</label>
+                    <input type="number" name="price" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label>حالة الدفع</label>
+                    <select name="status" class="form-select">
+                      <option value="paid">مدفوع (خالص)</option>
+                      <option value="unpaid" selected>آجل (كريدي)</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label>صورة المنتج</label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                  </div>
+                  <div class="alert d-none add-product-alert" role="alert"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary w-100">حفظ المنتج</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        modalsContainer.appendChild(addModal);
+
+        // Attach click listeners after elements are in DOM
+        // Image click -> open view modal
+        const imgBtn = col.querySelector(`img[role="button"][data-customer-id="${customer.id}"]`);
+        imgBtn?.addEventListener('click', () => {
+          const el = document.getElementById(viewModalId);
+          new bootstrap.Modal(el).show();
+        });
+
+        // View button
+        const viewBtn = col.querySelector('.view-customer-btn');
+        viewBtn?.addEventListener('click', () => {
+          const el = document.getElementById(viewModalId);
+          new bootstrap.Modal(el).show();
+        });
+
+        // Add product button -> open add modal
+        const addBtn = col.querySelector('.add-product-btn');
+        addBtn?.addEventListener('click', () => {
+          const el = document.getElementById(addModalId);
+          const bs = new bootstrap.Modal(el);
+          // reset form fields
+          const form = el.querySelector('.add-product-form');
+          form.reset();
+          const alertBox = form.querySelector('.add-product-alert');
+          alertBox.className = 'alert d-none';
+          bs.show();
+        });
+
+        // Add product form submit
+        const addForm = addModal.querySelector('.add-product-form');
+        addForm.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const custId = addForm.dataset.customerId;
+          const alertBox = addForm.querySelector('.add-product-alert');
+          alertBox.className = 'alert alert-info';
+          alertBox.textContent = 'جاري الحفظ...';
+
+          const fd = new FormData(addForm);
+          try {
+            const res = await fetch(`/api/customers/${encodeURIComponent(custId)}/products`, {
+              method: 'POST',
+              body: fd
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              alertBox.className = 'alert alert-danger';
+              alertBox.textContent = data.error || 'فشل في الإضافة';
+              return;
+            }
+            alertBox.className = 'alert alert-success';
+            alertBox.textContent = 'تمت الإضافة';
+            // close modal after short delay and refresh
+            setTimeout(() => {
+              const bsInstance = bootstrap.Modal.getInstance(addModal);
+              if (bsInstance) bsInstance.hide();
+              loadCustomers();
+            }, 600);
+          } catch (err) {
+            console.error(err);
+            alertBox.className = 'alert alert-danger';
+            alertBox.textContent = 'خطأ في الاتصال';
+          }
+        });
+      });
+
+      // Attach delegated listener for toggle-status inside modalsContainer
+      modalsContainer.querySelectorAll('.toggle-status').forEach(btn => {
+        btn.addEventListener('click', async (ev) => {
+          const target = ev.currentTarget;
+          const customerId = target.dataset.customerId;
+          const productId = target.dataset.productId;
+          const newStatus = target.dataset.newStatus;
+
+          target.disabled = true;
+          const spinner = document.createElement('span');
+          spinner.className = 'spinner-border spinner-border-sm me-2';
+          target.prepend(spinner);
+
+          try {
+            const res = await fetch(`/api/customers/${encodeURIComponent(customerId)}/change-payment`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ productId, newStatus })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              alert(data.error || 'خطأ');
+              target.disabled = false;
+              spinner.remove();
+              return;
+            }
+
+            // Update badge and button in DOM (closest list-group-item)
+            const listItem = target.closest('.list-group-item');
+            if (listItem) {
+              const badge = listItem.querySelector('.status-badge[data-product-id="' + productId + '"]');
+              if (badge) {
+                if (newStatus === 'paid') {
+                  badge.classList.remove('bg-danger');
+                  badge.classList.add('bg-success');
+                  badge.textContent = 'مدفوع';
+                } else {
+                  badge.classList.remove('bg-success');
+                  badge.classList.add('bg-danger');
+                  badge.textContent = 'غير مدفوع';
+                }
+              }
+              // switch button styles & data-new-status & text
+              if (newStatus === 'paid') {
+                target.classList.remove('btn-outline-success');
+                target.classList.add('btn-outline-secondary');
+                target.dataset.newStatus = 'unpaid';
+                target.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> إعادة لـ آجل';
+              } else {
+                target.classList.remove('btn-outline-secondary');
+                target.classList.add('btn-outline-success');
+                target.dataset.newStatus = 'paid';
+                target.innerHTML = '<i class="bi bi-check2-circle"></i> تعليم كـ مدفوع';
+              }
+            }
+
+            // Also refresh main list totals by reloading customers (cheap but correct)
+            await loadCustomers();
+          } catch (err) {
+            console.error(err);
+            alert('فشل الاتصال بالخادم');
+          } finally {
+            target.disabled = false;
+            spinner.remove();
+          }
+        });
+      });
+    }
+
+    // Utility: escape HTML
+    function escapeHtml(unsafe) {
+      if (unsafe == null) return '';
+      return String(unsafe)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    // Initial load
+    loadCustomers();
+  });
+  </script>
+</body>
+</html>
