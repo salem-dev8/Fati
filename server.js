@@ -82,7 +82,6 @@ app.post('/api/customers', upload.single('image'), async (req, res) => {
       }
     }
 
-    // generate product id
     const productId = Date.now().toString() + Math.random().toString(36).slice(2, 8);
 
     const newCustomer = {
@@ -146,7 +145,7 @@ app.post('/api/customers/:id/products', upload.single('image'), async (req, res)
   }
 });
 
-// API: Change payment status for a product (uses product.id)
+// API: Change payment status for a product
 app.post('/api/customers/:id/change-payment', async (req, res) => {
   try {
     const customerId = req.params.id;
@@ -173,6 +172,18 @@ app.post('/api/customers/:id/change-payment', async (req, res) => {
     await docRef.update({ products: updatedProducts });
 
     res.json({ success: true, products: updatedProducts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// API: Delete Customer (New Added Route)
+app.delete('/api/customers/:id', async (req, res) => {
+  try {
+    const customerId = req.params.id;
+    await db.collection('customers').doc(customerId).delete();
+    res.json({ success: true, message: 'Customer deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
