@@ -5,25 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر فطيمة</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; }
-        .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-        .status-paid { background-color: #d1e7dd; color: #0f5132; }
-        .status-unpaid { background-color: #f8d7da; color: #842029; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .navbar { background: linear-gradient(45deg, #0d6efd, #0dcaf0); }
-        .navbar-brand, .nav-link { color: white !important; font-weight: bold; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f4f7fb; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg mb-4">
+    <nav class="navbar navbar-expand-lg mb-4 shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <span style="font-size: 1.5rem;">🛍️ متجر فطيمة</span>
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-shop fs-3 me-2 text-white"></i>
+                <span class="fw-bold text-white">متجر فطيمة</span>
             </a>
-            <a href="/create" class="btn btn-light text-primary fw-bold rounded-pill px-4">+ زبون جديد</a>
+            <div class="ms-auto d-flex gap-2">
+                <a href="/create" class="btn btn-light text-primary fw-bold rounded-pill px-4">
+                    <i class="bi bi-person-plus me-2"></i>زبون جديد
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -36,40 +38,42 @@
         <% } %>
 
         <div class="row">
-            <% customers.forEach(customer => { %>
+            <% customers.forEach(customer => { 
+                // استخدم الصورة الأولى كصورة تمثيلية إن وجدت
+                const avatar = (customer.products && customer.products.length) ? customer.products[0].image : 'https://via.placeholder.com/300x300?text=No+Image';
+                const total = (customer.products || []).reduce((acc, curr) => acc + (Number(curr.price) || 0), 0);
+            %>
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                            <h5 class="m-0 text-primary"><%= customer.name %></h5>
-                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-<%= customer.id %>">
-                                + إضافة منتج
-                            </button>
-                        </div>
-                        <div class="card-body p-0">
-                            <ul class="list-group list-group-flush">
-                                <% customer.products.forEach(product => { %>
-                                    <li class="list-group-item d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center">
-                                            <img src="<%= product.image %>" class="product-img ms-2" alt="صورة">
-                                            <div>
-                                                <div class="fw-bold"><%= product.name %></div>
-                                                <small class="text-muted"><%= product.price %> د.ج</small>
-                                            </div>
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start gap-3">
+                                <img src="<%= avatar %>" class="avatar-img rounded" alt="صورة" role="button" data-bs-toggle="modal" data-bs-target="#view-<%= customer.id %>">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h5 class="m-0 text-primary"><%= customer.name %></h5>
+                                        <div class="text-end">
+                                            <small class="text-muted d-block">منتجات: <strong><%= (customer.products || []).length %></strong></small>
+                                            <small class="text-muted d-block">المجموع: <strong><%= total %> د.ج</strong></small>
                                         </div>
-                                        <span class="badge rounded-pill <%= product.status === 'paid' ? 'status-paid' : 'status-unpaid' %>">
-                                            <%= product.status === 'paid' ? 'تم الدفع' : 'آجل' %>
-                                        </span>
-                                    </li>
-                                <% }) %>
-                            </ul>
+                                    </div>
+                                    <p class="text-muted mt-2 small">اضغط على الصورة لعرض كل منتجات الزبون وتعديل الحالات</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-footer bg-white text-center">
-                            <small class="text-muted">المجموع: 
-                                <%= customer.products.reduce((acc, curr) => acc + curr.price, 0) %> د.ج
-                            </small>
+
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-<%= customer.id %>">
+                                <i class="bi bi-plus-circle me-1"></i> إضافة منتج
+                            </button>
+                            <div>
+                                <a class="btn btn-sm btn-link text-decoration-none" data-bs-toggle="modal" data-bs-target="#view-<%= customer.id %>">
+                                    <i class="bi bi-eye"></i> عرض الزبون
+                                </a>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Modal: إضافة منتج -->
                     <div class="modal fade" id="modal-<%= customer.id %>" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -107,11 +111,68 @@
                         </div>
                     </div>
 
+                    <!-- Modal: عرض الزبون وكل منتجاته -->
+                    <div class="modal fade" id="view-<%= customer.id %>" tabindex="-1">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">الزبون: <%= customer.name %></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="d-flex gap-3 mb-3 align-items-center">
+                                        <img src="<%= avatar %>" class="rounded" style="width:96px;height:96px;object-fit:cover;" alt="">
+                                        <div>
+                                            <p class="mb-1"><strong>عدد المنتجات:</strong> <%= (customer.products || []).length %></p>
+                                            <p class="mb-0"><strong>المجموع:</strong> <%= total %> د.ج</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="list-group">
+                                        <% (customer.products || []).forEach(product => { %>
+                                            <div class="list-group-item d-flex align-items-center justify-content-between flex-wrap">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <img src="<%= product.image %>" style="width:80px;height:80px;object-fit:cover;border-radius:8px;" alt="">
+                                                    <div>
+                                                        <div class="fw-bold"><%= product.name %></div>
+                                                        <small class="text-muted">السعر: <%= product.price %> د.ج</small><br>
+                                                        <small class="text-muted">التاريخ: <%= new Date(product.date).toLocaleString('ar-EG') %></small>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="badge rounded-pill <%= product.status === 'paid' ? 'bg-success' : 'bg-danger' %> mb-2 status-badge">
+                                                        <%= product.status === 'paid' ? 'مدفوع' : 'غير مدفوع' %>
+                                                    </span>
+                                                    <div>
+                                                        <% if (product.status === 'unpaid') { %>
+                                                            <button class="btn btn-sm btn-outline-success toggle-status" data-customer-id="<%= customer.id %>" data-product-date="<%= product.date %>" data-new-status="paid">
+                                                                <i class="bi bi-check2-circle"></i> تعليم كـ مدفوع
+                                                            </button>
+                                                        <% } else { %>
+                                                            <button class="btn btn-sm btn-outline-secondary toggle-status" data-customer-id="<%= customer.id %>" data-product-date="<%= product.date %>" data-new-status="unpaid">
+                                                                <i class="bi bi-arrow-counterclockwise"></i> إعادة لـ آجل
+                                                            </button>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             <% }) %>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/main.js"></script>
 </body>
 </html>
