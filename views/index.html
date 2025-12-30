@@ -3,202 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر فطيمة</title>
+    <title>متجر فطيمة | Fatima Shop</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
         :root {
-            --primary-color: #d63384; /* Pink */
-            --secondary-color: #6f42c1; /* Purple */
-            --bg-color: #f8f9fa;
+            --primary-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --primary-color: #d63384;
+            --text-color: #4a4a4a;
         }
 
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-color);
-            padding-bottom: 80px;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: var(--text-color);
+            padding-bottom: 100px;
         }
 
-        /* Navbar Styling */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glassmorphism Navbar */
         .navbar {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: var(--glass-border);
+            box-shadow: var(--glass-shadow);
             padding: 15px 0;
         }
 
         .navbar-brand img {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
-            border: 2px solid white;
-            object-fit: cover;
-            margin-left: 10px;
+            border: 3px solid rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .navbar-brand:hover img {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .navbar-brand span {
-            color: white;
-            font-weight: 700;
-            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-weight: 800;
+            font-size: 1.6rem;
+            margin-right: 10px;
         }
 
-        /* FAB Button (Add Customer) */
-        .fab-btn {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 65px;
-            height: 65px;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        /* Main Container Title */
+        .page-title {
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        /* Glass Cards */
+        .customer-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 25px;
+            border: var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .customer-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Card Image Area */
+        .card-img-top-container {
+            height: 220px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-display-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .customer-card:hover .product-display-img {
+            transform: scale(1.1);
+        }
+
+        .customer-avatar-overlay {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
+            background: white;
+            padding: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        
+        .customer-avatar-overlay div {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 4px 15px rgba(214, 51, 132, 0.4);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card-body {
+            padding: 40px 20px 20px; /* Top padding for avatar space */
+            text-align: center;
+        }
+
+        .customer-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .bg-paid { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .bg-unpaid { background-color: #f8d7da; color: #842029; border: 1px solid #f5c6cb; }
+
+        /* FAB Button */
+        .fab-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: all 0.3s;
             z-index: 1000;
             border: none;
         }
 
         .fab-btn:hover {
             transform: scale(1.1) rotate(90deg);
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 15px 35px rgba(214, 51, 132, 0.4);
         }
 
-        /* Cards Styling */
-        .customer-card {
-            background: white;
-            border-radius: 20px;
+        /* Modal Glass Style */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
             border: none;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            cursor: pointer;
-            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
         }
 
-        .customer-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        .modal-header {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 25px;
         }
 
-        .card-header-img {
-            height: 120px;
-            background: linear-gradient(135deg, #fce4ec, #e8daef);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: var(--secondary-color);
+        .modal-body {
+            padding: 25px;
         }
 
-        .customer-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: white;
-            position: absolute;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 3px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-color);
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-
-        .card-body {
-            padding-top: 50px;
-            text-align: center;
-        }
-
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 5px 12px;
-            border-radius: 20px;
-        }
-
-        .bg-paid { background-color: #d1e7dd; color: #0f5132; }
-        .bg-unpaid { background-color: #f8d7da; color: #842029; }
-
-        /* Product List in Modal */
+        /* Products List in Modal */
         .product-item {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .product-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            object-fit: cover;
-            margin-left: 15px;
-        }
-
-        .product-info {
-            flex-grow: 1;
+            transition: transform 0.2s;
+            border: 1px solid #f0f0f0;
         }
         
-        .price-tag {
-            font-weight: bold;
-            color: var(--primary-color);
+        .product-item:hover {
+            transform: scale(1.01);
         }
 
-        /* Modal Customization */
-        .modal-content {
-            border-radius: 20px;
-            border: none;
+        .product-img-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-left: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer; /* Zoom indication */
         }
-        .modal-header {
-            background: linear-gradient(to left, var(--bg-color), #fff);
-            border-bottom: 1px solid #eee;
-            border-radius: 20px 20px 0 0;
+        
+        .product-img-large:hover {
+            transform: scale(1.05); /* Slight zoom on hover */
+            transition: transform 0.3s ease;
         }
+
+        /* Forms inputs */
+        .form-control, .form-select {
+            border-radius: 15px;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            background: #f9f9f9;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.15);
+            border-color: var(--primary-color);
+        }
+
     </style>
 </head>
 <body>
 
-    <nav class="navbar sticky-top">
+    <nav class="navbar sticky-top animate__animated animate__fadeInDown">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="https://res.cloudinary.com/duixjs8az/image/upload/v1767107209/post_media/1767107209714-Gemini_Generated_Image_a87lhja87lhja87l.png" alt="Logo">
                 <span>متجر فطيمة</span>
             </a>
-            <div class="text-white">
-                <small><i class="fas fa-store"></i> لوحة التحكم</small>
+            <div class="text-white d-none d-md-block">
+                <span class="badge bg-white text-dark rounded-pill px-3 py-2 shadow-sm">
+                    <i class="fas fa-crown text-warning"></i> لوحة الإدارة
+                </span>
             </div>
         </div>
     </nav>
 
     <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-secondary"><i class="fas fa-users"></i> قائمة الزبائن</h3>
-            <span class="badge bg-secondary" id="customersCount">0 زبائن</span>
+        <div class="d-flex justify-content-between align-items-center mb-4 animate__animated animate__fadeInLeft">
+            <div>
+                <h2 class="page-title fw-bold"><i class="fas fa-gem me-2"></i> قائمة الزبائن والطلبات</h2>
+            </div>
+            <span class="badge bg-light text-dark fs-6 rounded-pill px-3 py-2 shadow" id="customersCount">
+                <i class="fas fa-spinner fa-spin"></i>
+            </span>
         </div>
 
         <div class="row g-4" id="customersGrid">
-            <div class="col-12 text-center mt-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p>جاري تحميل البيانات...</p>
+            <div class="col-12 text-center mt-5 text-white">
+                <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;"></div>
+                <p class="mt-3 fs-5">جاري جلب البيانات بأناقة...</p>
             </div>
         </div>
     </div>
 
-    <button class="fab-btn" data-bs-toggle="modal" data-bs-target="#addCustomerModal" title="إضافة زبون جديد">
+    <button class="fab-btn animate__animated animate__zoomIn" data-bs-toggle="modal" data-bs-target="#addCustomerModal" title="إضافة زبون جديد">
         <i class="fas fa-plus"></i>
     </button>
 
@@ -206,40 +296,45 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-user-plus text-primary"></i> تسجيل زبون جديد</h5>
+                    <h5 class="modal-title fw-bold text-primary"><i class="fas fa-magic"></i> تسجيل زبون جديد</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addCustomerForm">
                         <div class="mb-3">
-                            <label class="form-label">اسم الزبون</label>
-                            <input type="text" class="form-control" name="customerName" required placeholder="أدخل اسم الزبون">
+                            <label class="form-label text-muted fw-bold">اسم الزبون</label>
+                            <input type="text" class="form-control" name="customerName" required placeholder="أدخل اسم الزبون هنا...">
                         </div>
-                        <hr>
-                        <h6 class="text-muted mb-3">تفاصيل المنتج الأول</h6>
-                        <div class="mb-3">
-                            <label class="form-label">اسم المنتج</label>
-                            <input type="text" class="form-control" name="productName" required placeholder="مثال: فستان سهرة">
-                        </div>
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="form-label">السعر (DZD)</label>
-                                <input type="number" class="form-control" name="price" required placeholder="0">
+                        
+                        <div class="p-3 bg-light rounded-4 mb-3 border">
+                            <h6 class="text-primary fw-bold mb-3"><i class="fas fa-tshirt"></i> تفاصيل المنتج الأول</h6>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">اسم المنتج</label>
+                                <input type="text" class="form-control" name="productName" required placeholder="مثال: قفطان ملكي">
                             </div>
-                            <div class="col-6 mb-3">
-                                <label class="form-label">حالة الدفع</label>
-                                <select class="form-select" name="status">
-                                    <option value="unpaid">غير مدفوع</option>
-                                    <option value="paid">مدفوع</option>
-                                </select>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label text-muted small">السعر (DZD)</label>
+                                    <input type="number" class="form-control" name="price" required placeholder="0">
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label text-muted small">حالة الدفع</label>
+                                    <select class="form-select" name="status">
+                                        <option value="unpaid">غير مدفوع ❌</option>
+                                        <option value="paid">مدفوع ✅</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label text-muted small">صورة المنتج</label>
+                                <input type="file" class="form-control" name="image" accept="image/*">
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">صورة المنتج</label>
-                            <input type="file" class="form-control" name="image" accept="image/*">
-                        </div>
+
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">حفظ البيانات</button>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm" style="background: var(--primary-gradient); border:none;">
+                                <i class="fas fa-check-circle"></i> حفظ البيانات
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -250,46 +345,61 @@
     <div class="modal fade" id="customerDetailsModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="detailCustomerName">تفاصيل الزبون</h5>
+                <div class="modal-header bg-light">
+                    <h4 class="modal-title fw-bold text-dark" id="detailCustomerName"></h4>
                     <div>
-                        <button class="btn btn-outline-danger btn-sm me-2" id="btnDeleteCustomer">
-                            <i class="fas fa-trash"></i> حذف الزبون
+                        <button class="btn btn-danger rounded-pill btn-sm me-2 shadow-sm" id="btnDeleteCustomer">
+                            <i class="fas fa-trash-alt"></i> حذف
                         </button>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                 </div>
-                <div class="modal-body bg-light">
-                    <div id="productsList"></div>
+                <div class="modal-body" style="background: #f8f9fa;">
+                    <div id="productsList" class="mb-4"></div>
 
-                    <div class="card mt-4 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-cart-plus"></i> إضافة منتج جديد لهذا الزبون</h6>
-                            <form id="addProductForm" class="row g-2">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-body bg-white">
+                            <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-cart-plus"></i> إضافة منتج إضافي</h6>
+                            <form id="addProductForm" class="row g-3 align-items-end">
                                 <input type="hidden" id="currentCustomerId">
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" name="productName" placeholder="اسم المنتج" required>
+                                    <label class="small text-muted">اسم المنتج</label>
+                                    <input type="text" class="form-control" name="productName" placeholder="..." required>
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="number" class="form-control" name="price" placeholder="السعر" required>
+                                    <label class="small text-muted">السعر</label>
+                                    <input type="number" class="form-control" name="price" placeholder="0" required>
                                 </div>
                                 <div class="col-md-3">
+                                    <label class="small text-muted">الحالة</label>
                                     <select class="form-select" name="status">
                                         <option value="unpaid">غير مدفوع</option>
                                         <option value="paid">مدفوع</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
+                                    <label class="small text-muted">الصورة</label>
                                     <input type="file" class="form-control" name="image" accept="image/*">
                                 </div>
-                                <div class="col-12 text-end mt-2">
-                                    <button type="submit" class="btn btn-success rounded-pill px-4">
-                                        <i class="fas fa-plus"></i> إضافة
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm">
+                                        <i class="fas fa-plus"></i> إضافة للمحفظة
                                     </button>
                                 </div>
                             </form>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent shadow-none border-0">
+                <div class="modal-body p-0 text-center">
+                    <img src="" id="previewImage" class="img-fluid rounded-4 shadow-lg" style="max-height: 80vh;">
+                    <button type="button" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
                 </div>
             </div>
         </div>
@@ -320,38 +430,45 @@
 
         function renderCustomers(customers) {
             const grid = document.getElementById('customersGrid');
-            document.getElementById('customersCount').innerText = `${customers.length} زبائن`;
+            document.getElementById('customersCount').innerText = `${customers.length} زبون`;
             
             if (customers.length === 0) {
-                grid.innerHTML = `<div class="col-12 text-center text-muted py-5">
-                    <i class="fas fa-box-open fa-3x mb-3"></i><br>لا يوجد زبائن حالياً
+                grid.innerHTML = `
+                <div class="col-12 text-center text-white py-5 animate__animated animate__fadeIn">
+                    <i class="fas fa-box-open fa-5x mb-3 opacity-50"></i>
+                    <h3>المتجر فارغ حالياً</h3>
+                    <p>أضف أول زبون من الزر في الأسفل</p>
                 </div>`;
                 return;
             }
 
-            grid.innerHTML = customers.map(c => {
+            grid.innerHTML = customers.map((c, index) => {
                 const productCount = c.products ? c.products.length : 0;
-                // Get the latest product to show status summary
+                // Get the last product image to show on the card cover
                 const latestProduct = c.products && c.products.length > 0 ? c.products[c.products.length - 1] : null;
+                const coverImage = latestProduct && latestProduct.image !== 'https://via.placeholder.com/300x300?text=No+Image' 
+                    ? latestProduct.image 
+                    : 'https://via.placeholder.com/500x500/ff9a9e/ffffff?text=Fatima+Shop'; // Default pretty placeholder
+
                 const hasUnpaid = c.products && c.products.some(p => p.status === 'unpaid');
                 
                 return `
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-6 animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
                     <div class="customer-card" onclick="openCustomerModal('${c.id}')">
-                        <div class="card-header-img">
-                            <i class="fas fa-shopping-bag opacity-25"></i>
-                        </div>
-                        <div class="customer-avatar shadow">
-                            ${c.name.charAt(0).toUpperCase()}
+                        <div class="card-img-top-container">
+                            <img src="${coverImage}" class="product-display-img" alt="Cover">
+                            <div class="customer-avatar-overlay">
+                                <div>${c.name.charAt(0).toUpperCase()}</div>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <h5 class="fw-bold text-dark mb-1">${c.name}</h5>
-                            <p class="text-muted small mb-2">
-                                <i class="fas fa-layer-group"></i> ${productCount} منتجات
+                            <h4 class="customer-name">${c.name}</h4>
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-layer-group text-primary"></i> يملك ${productCount} منتجات
                             </p>
                             ${hasUnpaid 
-                                ? '<span class="badge bg-unpaid">عليه ديون <i class="fas fa-exclamation-circle"></i></span>' 
-                                : '<span class="badge bg-paid">خالص الحساب <i class="fas fa-check-circle"></i></span>'}
+                                ? '<span class="status-badge bg-unpaid">عليه ديون <i class="fas fa-exclamation-circle"></i></span>' 
+                                : '<span class="status-badge bg-paid">خالص الحساب <i class="fas fa-check-circle"></i></span>'}
                         </div>
                     </div>
                 </div>
@@ -364,7 +481,6 @@
             e.preventDefault();
             const formData = new FormData(e.target);
             
-            // Show loading
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
@@ -380,10 +496,11 @@
                 if (data.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'تمت الإضافة',
-                        text: 'تم تسجيل الزبون بنجاح',
+                        title: 'تم بنجاح',
+                        text: 'أضيف الزبون إلى القائمة',
                         timer: 1500,
-                        showConfirmButton: false
+                        showConfirmButton: false,
+                        backdrop: `rgba(0,0,123,0.4)`
                     });
                     e.target.reset();
                     bootstrap.Modal.getInstance(document.getElementById('addCustomerModal')).hide();
@@ -404,7 +521,9 @@
             const customer = allCustomers.find(c => c.id === id);
             if (!customer) return;
 
-            document.getElementById('detailCustomerName').innerHTML = `<i class="fas fa-user"></i> ${customer.name}`;
+            document.getElementById('detailCustomerName').innerHTML = `
+                <span class="badge bg-primary rounded-circle p-2 me-2"><i class="fas fa-user"></i></span>
+                ${customer.name}`;
             document.getElementById('currentCustomerId').value = customer.id;
             
             // Render Products
@@ -426,20 +545,28 @@
             }
 
             container.innerHTML = customer.products.map(p => `
-                <div class="product-item shadow-sm">
-                    <img src="${p.image}" class="product-img" alt="product">
-                    <div class="product-info">
-                        <h6 class="fw-bold mb-1">${p.name}</h6>
-                        <span class="price-tag">${p.price} DZD</span>
+                <div class="product-item">
+                    <img src="${p.image}" class="product-img-large" alt="product" onclick="showImage('${p.image}')">
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="fw-bold mb-1 text-dark">${p.name}</h5>
+                        <div class="text-muted small mb-2"><i class="far fa-clock"></i> ${new Date(p.date).toLocaleDateString('ar-EG')}</div>
+                        <h5 class="text-primary fw-bold mb-0">${p.price} DZD</h5>
                     </div>
                     <div class="text-end">
-                        <button class="btn btn-sm ${p.status === 'paid' ? 'btn-success' : 'btn-danger'} rounded-pill"
+                        <button class="btn btn-sm ${p.status === 'paid' ? 'btn-outline-success' : 'btn-outline-danger'} rounded-pill px-3"
                             onclick="toggleStatus('${customer.id}', '${p.id}', '${p.status}')">
                             ${p.status === 'paid' ? 'مدفوع <i class="fas fa-check"></i>' : 'غير مدفوع <i class="fas fa-times"></i>'}
                         </button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Show large image
+        window.showImage = (src) => {
+            if(!src || src.includes('placeholder')) return;
+            document.getElementById('previewImage').src = src;
+            new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
         }
 
         // Toggle Payment Status
@@ -455,16 +582,16 @@
                 const data = await res.json();
                 
                 if (data.success) {
-                    // Update local data
                     const customer = allCustomers.find(c => c.id === customerId);
                     customer.products = data.products;
-                    renderProductsList(customer); // Refresh modal list
-                    renderCustomers(allCustomers); // Refresh main grid badges
+                    renderProductsList(customer); 
+                    renderCustomers(allCustomers); 
                     
                     const Toast = Swal.mixin({
-                        toast: true, position: 'top-end', showConfirmButton: false, timer: 2000
+                        toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
+                        background: '#fff', color: '#333'
                     });
-                    Toast.fire({ icon: 'success', title: 'تم تغيير حالة الدفع' });
+                    Toast.fire({ icon: 'success', title: 'تم تحديث الحالة' });
                 }
             } catch (err) {
                 console.error(err);
@@ -489,7 +616,6 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    // Update global list
                     const index = allCustomers.findIndex(c => c.id === customerId);
                     allCustomers[index] = data.customer;
                     
@@ -502,7 +628,7 @@
             } catch (err) {
                 Swal.fire('خطأ', 'فشل إضافة المنتج', 'error');
             } finally {
-                btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
+                btn.innerHTML = '<i class="fas fa-plus"></i> إضافة للمحفظة';
                 btn.disabled = false;
             }
         });
@@ -510,14 +636,18 @@
         // Delete Customer
         window.deleteCustomer = async (id) => {
             const result = await Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: "سيتم حذف الزبون وكل منتجاته نهائياً!",
+                title: 'حذف الزبون؟',
+                text: "لا يمكن التراجع عن هذا الإجراء",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء'
+                cancelButtonColor: '#adb5bd',
+                confirmButtonText: 'نعم، حذف',
+                cancelButtonText: 'تراجع',
+                background: '#fff',
+                customClass: {
+                    popup: 'rounded-4'
+                }
             });
 
             if (result.isConfirmed) {
@@ -529,7 +659,7 @@
                         allCustomers = allCustomers.filter(c => c.id !== id);
                         renderCustomers(allCustomers);
                         bootstrap.Modal.getInstance(document.getElementById('customerDetailsModal')).hide();
-                        Swal.fire('تم الحذف!', 'تم حذف الزبون بنجاح.', 'success');
+                        Swal.fire('تم الحذف!', 'تمت إزالة الزبون.', 'success');
                     }
                 } catch (err) {
                     Swal.fire('خطأ', 'فشل الحذف', 'error');
